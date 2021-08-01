@@ -8,20 +8,24 @@ use Nette\Utils\Arrays;
 
 class ScraperController extends Controller
 {
-    private $result = array();
+    private $results = array();
 
     public function Scraper (){
         
-        $client = new Client();
-        
+        $client = new Client();        
         $url ='https://www.worldometers.info/coronavirus/';
-
         $page = $client->request('GET', $url);
 
-        echo "<pre>";
-        print_r($page);
+        // echo "<pre>";
+        // print_r($page);
 
+        // echo $page->filter('.maincounter-number')->text();
 
-        return view('scraper');
+        $page->filter('#maincounter-wrap')->each(function($item){
+            $this->results[$item->filter('h1')->text()] = $item->filter('.maincounter-number')->text();
+        });
+
+        $data = $this->results;
+        return view('scraper', compact('data'));
     }
 }
